@@ -1,15 +1,33 @@
 const express = require('express');
+const mongoose = require('mongoose');
+const authRoutes = require('./routes/authRoutes')
+const cookieParser = require('cookie-parser')
+const path = require('path');
+const {requireAuth} = require('./authMiddlewares/middlewares')
 const app = express();
 
-app.use(express.static('public'));
+const staticPath = path.join(__dirname,'/public');
+app.use(express.static(staticPath));
+// app.use(express.cookieParser())
+
 app.use(express.json());
 app.set('view engine', 'ejs');
 
+const dbURI = 'mongodb+srv://sourav:9937382009@cluster0.uutd9.mongodb.net/Livefeed';
+mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true})
+.then((result)=> {
+    app.listen(3000,()=>{
+        console.log('Listening at port 3000')
+    })
+})
+.catch((err => console.log(err)))
 
-app.get('/',(req,res)=>{
-    res.render('home')
+
+
+
+app.get('/' ,(req,res)=>{
+    res.render('home')       // THIS ROUTE WILL RENDER ALWAYS BECAUSE THE HOME PAGE OF THE WEBPAGE
 })
 
-app.listen(3000,()=>{
-    console.log("listening at port 3000")
-})
+
+app.use(authRoutes)
